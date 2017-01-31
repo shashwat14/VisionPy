@@ -11,7 +11,7 @@ class Dataset(object):
 
     def __init__(self, flag=False):
         self.id = 0
-        with open('C:\\Users\\Shashwat\\Storage\\Datasets\\dataset\\poses\\00.txt', 'rb') as f:
+        with open('/home/therumsticks/Downloads/00/poses/00.txt', 'rb') as f:
             content = f.readlines()
         for  i in range(len(content)):
             content[i] = content[i].decode('utf-8').strip().split()
@@ -52,19 +52,19 @@ class Dataset(object):
                 imgURL2 = "00" + str(i+1)
             
         #Left image
-        leftURL = "C:\\Users\\Shashwat\\Storage\\Datasets\\dataset\\sequences\\00\\image_0\\" + imgURL + ".png"
+        leftURL = "/home/therumsticks/Downloads/00/image_0/" + imgURL + ".png"
         left = cv2.imread(leftURL, 0)
         
         #right image
-        rightURL = "C:\\Users\\Shashwat\\Storage\\Datasets\\dataset\\sequences\\00\\image_1\\" + imgURL + ".png"
+        rightURL = "/home/therumsticks/Downloads/00/image_1/" + imgURL + ".png"
         right = cv2.imread(rightURL, 0)
         
         #left image at t + 1
-        leftURL2 = "C:\\Users\\Shashwat\\Storage\\Datasets\\dataset\\sequences\\00\\image_0\\" + imgURL2 + ".png"
+        leftURL2 = "/home/therumsticks/Downloads/00/image_0/" + imgURL2 + ".png"
         left2 = cv2.imread(leftURL2, 0)
         
         #right image at t + 1
-        rightURL2 = "C:\\Users\\Shashwat\\Storage\\Datasets\\dataset\\sequences\\00\\image_1\\" + imgURL2 + ".png"
+        rightURL2 = "/home/therumsticks/Downloads/00/image_1/" + imgURL2 + ".png"
         right2 = cv2.imread(rightURL2, 0)
         if self.getTwoFrames:
             return (left, right, left2, right2)
@@ -74,9 +74,33 @@ class Dataset(object):
     def getImage(self):
         pass
     def iterate(self):
-        self.id+=1
+        if self.id == 4538:
+            return False
+        else:
+            self.id+=1
+            return True
 
 class Geometry(object):
     
     def __init__(self):
         pass
+class Camera(object):
+    
+    def __init__(self, mtx, baseline = 1):
+        self.mtx = mtx
+        self.baseline = baseline
+    def getCalibrationMatrix(self):
+        return self.mtx
+    def setPose(self, pose):
+        self.pose = pose
+    def getPose(self):
+        return self.pose
+    def move(self, mtx):
+        self.move = self.move*mtx
+    def triangulate(self, x1, y1, x2, y2):
+        Q = np.matrix([[1,0,0,-self.mtx[0,2]],[0,1,0,-self.mtx[1,2]],[0,0,0,self.mtx[0,0]],[0,0,-1/self.baseline, 0]])
+        P = np.matrix([x1, y1, x1-x2,1]).T
+        scaledX = Q.dot(P)
+        scaledX/=scaledX[-1,0]
+        return scaledX
+        
