@@ -10,19 +10,19 @@ import cv2
 class Dataset(object):
 
     def __init__(self, flag=False):
-        self.id = 0
+        self.id = -1
         with open('/home/therumsticks/Downloads/00/poses/00.txt', 'rb') as f:
             content = f.readlines()
         for  i in range(len(content)):
             content[i] = content[i].decode('utf-8').strip().split()
             content[i] = [float(x) for x in content[i]]
-            content[i] = np.matrix(content[i]).reshape(3,4)
+            content[i] = np.matrix(content[i], dtype='float32').reshape(3,4)
         self.content = content
         self.getTwoFrames = flag
         
         
-    def getGroundTruth(self):
-        return self.content[self.id]
+    def getPose(self):
+        return self.content[self.id+1]
     
     def getImageStereo(self):
         i= self.id
@@ -86,7 +86,7 @@ class Geometry(object):
         pass
 class Camera(object):
     
-    def __init__(self, mtx, baseline = 1):
+    def __init__(self, mtx, baseline = 1.):
         self.mtx = mtx
         self.baseline = baseline
     def getCalibrationMatrix(self):
@@ -98,8 +98,8 @@ class Camera(object):
     def move(self, mtx):
         self.move = self.move*mtx
     def triangulate(self, x1, y1, x2, y2):
-        Q = np.matrix([[1,0,0,-self.mtx[0,2]],[0,1,0,-self.mtx[1,2]],[0,0,0,self.mtx[0,0]],[0,0,-1/self.baseline, 0]])
-        P = np.matrix([x1, y1, x1-x2,1]).T
+        Q = np.matrix([[1,0,0,-self.mtx[0,2]],[0,1,0,-self.mtx[1,2]],[0,0,0,self.mtx[0,0]],[0,0,-1/self.baseline, 0]], dtype='float32')
+        P = np.matrix([x1, y1, x1-x2,1],dtype='float32').T
         scaledX = Q.dot(P)
         scaledX/=scaledX[-1,0]
         return scaledX
