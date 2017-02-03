@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from Dataset import Dataset, Geometry, Camera
 import cv2
 import numpy as np
@@ -65,22 +63,23 @@ while ret:
         trans = trans + scale*tvec.T.dot(rotation)
         rotation = rvec.dot(rotation)
     
-    x = -trans[0,0]
-    y = trans[0,1]
-    z = trans[0,2]
-    cv2.circle(img, (int(x)+offset[0], int(z)+offset[2]), 5, (0,0,255), -1)
+    x1 = -trans[0,0]
+    y1= trans[0,1]
+    z1 = trans[0,2]
+    cv2.circle(img, (int(x1)+offset[0], int(z1)+offset[2]), 1, (0,0,255), -1)
     
     
     
     
     left, right, left2, right2 = data.getImageStereo()
     pose = data.getPose()
-    x = pose[0,-1]
-    y = pose[1,-1]
-    z = pose[2,-1]
-    cv2.circle(img, (int(x)+offset[0], int(z)+offset[2]), 5, (0,255,0), -1)
+    x2 = pose[0,-1]
+    y2 = pose[1,-1]
+    z2 = pose[2,-1]
+    cv2.circle(img, (int(x2)+offset[0], int(z2)+offset[2]), 1, (0,255,0), -1)
     pose = np.vstack((pose, np.matrix([0,0,0,1])))
-    
+    error = ((x2-x1)**2. + (z2-z1)**2.)**0.5
+    print error
     cv2.imshow("Frame", img)
     ch = cv2.waitKey(1)
     if ch == ord('q'):
@@ -88,3 +87,5 @@ while ret:
     
     ret = data.iterate()
 cv2.destroyAllWindows()
+
+

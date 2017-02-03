@@ -10,7 +10,7 @@ def Triangulate(features):
         
         x1, y1 = f1.pt
         x2, y2 = f2.pt        
-        X.append(cam.triangulate(x1, y1, x2, y2)[:3])
+        X.append(cam.triangulate(x1, y1, x2, y2))
     return X
 def getGoodMatches(matches, kp1, kp2, des1, des2, epipolar=False):
     

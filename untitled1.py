@@ -30,6 +30,15 @@ point = np.matrix([1,1,20]).T
 points.append(point)
 point = np.matrix([0,2,10]).T
 points.append(point)
+point = np.matrix([0,2,8]).T
+points.append(point)
+point = np.matrix([1,2,8]).T
+points.append(point)
+point = np.matrix([0,1,8]).T
+points.append(point)
+point = np.matrix([1,1,7]).T
+points.append(point)
+
 
 
 points2d = []
@@ -50,4 +59,4 @@ for i in range(len(points)):
 points = np.array(points, dtype='float32')
 newPoints = np.array(newPoints, dtype='float32')
 
-ret , rvec, tvec = cv2.solvePnP(points, newPoints, cam.getCalibrationMatrix(), None)
+ret , rvec, tvec, inliers = cv2.solvePnPRansac(points, newPoints, cam.getCalibrationMatrix(), None, reprojectionError=1.0, confidence=0.999)

@@ -21,8 +21,8 @@ class Dataset(object):
         self.getTwoFrames = flag
         
         
-    def getPose(self):
-        return self.content[self.id+1]
+    def getPose(self, i=0):
+        return self.content[self.id + i]
     
     def getImageStereo(self):
         i= self.id
@@ -98,9 +98,12 @@ class Camera(object):
     def move(self, mtx):
         self.move = self.move*mtx
     def triangulate(self, x1, y1, x2, y2):
-        Q = np.matrix([[1,0,0,-self.mtx[0,2]],[0,1,0,-self.mtx[1,2]],[0,0,0,self.mtx[0,0]],[0,0,-1/self.baseline, 0]], dtype='float32')
-        P = np.matrix([x1, y1, x1-x2,1],dtype='float32').T
-        scaledX = Q.dot(P)
-        scaledX/=scaledX[-1,0]
-        return scaledX
+        x1 = x1 - self.mtx[0,2]
+        x2 = x2 - self.mtx[0,2]
+        y1 = y1 - self.mtx[1,2]
+        Z = self.mtx[0,0]*self.baseline/(x1-x2)
+        
+        X = x1*Z/self.mtx[0,0]        
+        Y = y1*Z/self.mtx[0,0]        
+        return np.matrix([X,Y,Z])
         
