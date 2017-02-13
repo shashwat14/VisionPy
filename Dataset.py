@@ -96,7 +96,7 @@ class Camera(object):
     def getPose(self):
         return self.pose
     def move(self, mtx):
-        self.move = self.move*mtx
+        self.move = self.move.dot(mtx)
     def triangulate(self, x1, y1, x2, y2):
         x1 = x1 - self.mtx[0,2]
         x2 = x2 - self.mtx[0,2]
