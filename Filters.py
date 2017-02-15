@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import numpy as np
 class KalmanFilter(object):
     
@@ -12,7 +14,7 @@ class KalmanFilter(object):
         self.R = R    #Estimated Measurement Noise
     
     def predict(self, controlVector):
-        self.X = self.A*self.X + self.B*controlVector
+        self.X = self.A * self.X + self.B*controlVector
         self.P = self.A*self.P*self.A.T + self.Q
         
     def observe(self, measurementVector):
@@ -28,12 +30,3 @@ class KalmanFilter(object):
         return self.X
     
 
-A = np.matrix([[1.]])
-H = np.matrix([[1.]])
-Q = np.matrix([[0.0001]])
-R = np.matrix([[0.1]])
-X = np.matrix([[100.]])
-P = np.matrix([[1.]])
-
-B = np.matrix([1.])
-obj = KalmanFilter(A, B, H, X, P, Q, R)
