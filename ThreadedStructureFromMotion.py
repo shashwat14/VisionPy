@@ -3,36 +3,35 @@
 from Dataset import Dataset, Camera
 import cv2
 import numpy as np
+from Geometry import Point3D
 
-def getKeyPointArray(kp):
-    
+def Triangulate(correspondences):
+    left, right = correspondences
+    P = []
+    for l, r in zip(left,right):
+        if int(l[1]) == int(r[1]):
+            X = robot.triangulate(l[0],l[1],r[0],r[1])
+            P.append(Point3D(data.id, X, l))
+    return P
+        
+        
+def detectFeaturesAndCorrespondence(left, right):
+    kp = fast.detect(pleft, None)
     p0 = []
     for k in kp:
         p0.append([[k.pt[0],k.pt[1]]])
     p0 = np.array(p0, dtype='float32')
-    
-    return p0
-
-def getStereoCorrespondence(left, right):
-    
-    kp = fast.detect(left, None)
-    p0 = getKeyPointArray(kp)
-    p1, st, err = cv2.calcOpticalFlowPyrLK(left, right, p0, None, **lk_params)
+      
+    p1, st, err = cv2.calcOpticalFlowPyrLK(pleft, pright, p0, None, **lk_params)
     good_right = p1[st==1]
     good_left = p0[st==1]
     
     return (good_left, good_right)
     
-def doSFM(left, right, pleft, pright):
-    
-    good_left, good_right = getStereoCorrespondence(pleft, pright)
-    
-    
-    
-    return (good_left, good_right)
     
 
 #Set intiial values
+Graph = []
 data = Dataset()
 focalX = 718.856
 focalY = 718.856
@@ -59,9 +58,11 @@ while ret:
     #Get new images
     ret = data.iterate()
     left, right = data.getImageStereo()
+    correspondences_spatio = detectFeaturesAndCorrespondence(pleft, pright)
+    #Check for repeated 3D points
+    Points3D = Triangulate(correspondences_spatio)
     
-    #Do SFM
-    SFMObject = doSFM(left, right, pleft, pright)
+    correspndences_temporal = detectFeaturesAndCorrespondence(pleft, left)
     
     #Store the new images as previous images
     pleft = left.copy()
